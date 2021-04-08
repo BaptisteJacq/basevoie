@@ -117,7 +117,6 @@ De plus, la table fille ne dispose d'aucun champ discriminant la validité de la
 
 Comme on peut le voir dans la figure ci-dessus, *ILTADTN* est la table fille de la table parente *ILTATRC*.  
 Cependant, 7521 tronçons présents dans la table fille (*ILTADTN*) sont invalides dans la table parente (*ILTATRC*). Il n'y a manifestement pas de mise à jour automatique des données de la table fille en fonction de la validité des données de la table parente.  
-De plus, la table fille ne dispose d'aucun champ discriminant la validité de la donnée.
 
 #### Relation *VOIECVT* / *ILTATRC*
 
@@ -127,7 +126,6 @@ De plus, la table fille ne dispose d'aucun champ discriminant la validité de la
 
 Comme on peut le voir dans la figure ci-dessus, *VOIECVT* est la table fille de la table parente *ILTATRC*.  
 Cependant, 7507 tronçons présents dans la table fille (*VOIECVT*) sont invalides dans la table parente (*ILTATRC*). Il n'y a manifestement pas de mise à jour automatique des données de la table fille en fonction de la validité des données de la table parente.  
-De plus, la table fille ne dispose d'aucun champ discriminant la validité de la donnée.
 
 #### Relation *ILTAFILIA* / *ILTATRC*
 
@@ -137,7 +135,6 @@ De plus, la table fille ne dispose d'aucun champ discriminant la validité de la
 
 Comme on peut le voir dans la figure ci-dessus, *ILTAFILIA* est la table fille de la table parente *ILTATRC*. 
 Cependant, on note que 641 tronçons présents dans *ILTAFILIA* sont invalides dans la table parente *ILTATRC*. Il n'y a manifestement pas de mise à jour automatique des données de la table fille en fonction de la validité des données de la table parente.  
-De plus, la table fille ne dispose d'aucun champ discriminant la validité de la donnée.
 
 ### 2.2 Les voies
 
@@ -158,7 +155,6 @@ Cependant, 3 voies présentes dans la table fille *VOIEVOI* sont absentes dans l
 
 Comme on peut le voir dans la figure ci-dessus, *VOIECVT* est la table fille de la table parente *VOIEVOI*.
 Cependant, 1021 voies présentes dans la table fille *VOIECVT* sont invalides dans la table parente *VOIEVOI*, il n'y a donc aucune mise à jour de la table fille en fonction de la validité de la donnée de la table parente.  
-De plus, la table fille ne dispose d'aucun champ discriminant la validité de la donnée.
 
 #### Relation *TA_RUEVOIE* / *VOIEVOI*
 
@@ -192,7 +188,6 @@ De plus, ni la table fille ni la table parente ne disposent de champ discriminan
 
 Comme on peut le voir dans la figure ci-dessus, *ILTADTN* est la table fille de la table parente *ILTAPTZ*.
 Cependant, 1927 noeuds présents dans la table fille *ILTADTN* sont invalides dans la table parente *ILTAPTZ*, il n'y a donc aucune mise à jour de la table fille en fonction de la validité de la donnée de la table parente.  
-De plus, la table fille ne dispose d'aucun champ discriminant la validité de la donnée.  
 
 ### 2.5 Les rues et les fantoirs
 
