@@ -273,7 +273,7 @@ Dans la table ILTATRC des schémas SIDU et G_SIDU on retrouve des incohérences 
 - 1752 tronçons tagués *invalide* dans ILTATRC sont tagués *valide* dans ILTADTN ;
 - 50596 tronçons sont tagués en *valide* dans ILTADTN, alors que seuls 48844 tronçons le sont dans ILTATRC ;
 
-**Attention**, dans les deux schémas un tronçon peut à la fois être tagué en *valide*, avoir une date de saisie postérieur à sa date de fin de validité et avoir une date de début de validité également postérieure à sa date de fin de validité.
+**Attention**, dans les deux schémas un tronçon peut à la fois être tagué en *valide*, avoir une date de saisie postérieure à sa date de fin de validité et avoir une date de début de validité également postérieure à sa date de fin de validité.
 
 ###### figure n°17 : validité des tronçons entre ILTADTN et ILTATRC pour une date de fin de validité incohérente dans SIDU
 |Nombre de tronçons|Validité ILTADTN|Validité ILTATRC|Incohérences de dates                         |
