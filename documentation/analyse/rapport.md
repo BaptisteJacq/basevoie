@@ -227,7 +227,7 @@ De plus, la table fille ne dispose d'aucun champ discriminant la validité de la
 
 Les index spatiaux dans oracle permettent de limiter les types de géométries enregistrés dans la table, de spécifier le tablespace et le worktablespace utilisés pour traiter les géométries. La présence d'index spatiaux permet aussi d'accélérer les traitements géométriques.
 
-Cependant comme on peut le voir dans la figure n°4, certaines tables disposant d'un champ géométrique n'ont pas d'index spatial. Cela est d'autant plus problématique qu'il s'agit des tables de lignes, de noeuds et de seuils de la base voie, qui sont fréquemment mis à jour. Les utilisateurs et les applications peuvent donc en théorie enregistrer n'importe quelle type de géométrie dans ces bases. En outre, puisqu'aucun tablespace ni worktablespace n'est spécifié, nous supposons que tablespaces et workspaces par défaut sont utilisés, ce qui ne correspond pas aux tables normalement utilisées pour les index spatiaux.
+Cependant comme on peut le voir dans la figure n°16, certaines tables disposant d'un champ géométrique n'ont pas d'index spatial. Cela est d'autant plus problématique qu'il s'agit des tables de lignes, de noeuds et de seuils de la base voie, qui sont fréquemment mis à jour. Les utilisateurs et les applications peuvent donc en théorie enregistrer n'importe quelle type de géométrie dans ces bases. En outre, puisqu'aucun tablespace ni worktablespace n'est spécifié, nous supposons que tablespaces et workspaces par défaut sont utilisés, ce qui ne correspond pas aux tables normalement utilisées pour les index spatiaux.
 
 ###### figure n°16 : Les index spatiaux en base
 
