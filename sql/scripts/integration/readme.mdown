@@ -1,0 +1,10 @@
+### Integration
+
+Ce dossier contient les codes nécessaires à l'import des tables de G_SIDU dans le nouveau schéma de la base voie et à leur correction / amélioration.
+
+### Détail :
+
+- Commande ogr2ogr permettant d'importer les tables de G_SIDU dans le nouveau schéma sur oracle 12c ;
+- Correction des erreurs de données de la base voie ;
+- Correction de la structure de la base voie ;
+- Ajout de triggers dans la base voie ;

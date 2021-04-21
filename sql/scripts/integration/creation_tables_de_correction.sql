@@ -1,0 +1,282 @@
+-- Suppression des tables CORRECTION
+    /*
+    DROP TABLE G_SIDU.CORRECTION_ILTATRC CASCADE CONSTRAINTS;
+
+    DELETE FROM USER_SDO_G_SIDUM_METADATA
+    WHERE TABLE_NAME = 'CORRECTION_ILTATRC';
+    COMMIT;
+
+    DROP TABLE G_SIDU.CORRECTION_ILTAPTZ CASCADE CONSTRAINTS;
+
+    DELETE FROM USER_SDO_G_SIDUM_METADATA
+    WHERE TABLE_NAME = 'CORRECTION_ILTAPTZ';
+    COMMIT;
+
+    DROP TABLE G_SIDU.CORRECTION_ILTADTN CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_ILTALPU CASCADE CONSTRAINTS;
+
+    DELETE FROM USER_SDO_G_SIDUM_METADATA
+    WHERE TABLE_NAME = 'CORRECTION_ILTALPU';
+    COMMIT;
+
+    DROP TABLE G_SIDU.CORRECTION_ILTASEU CASCADE CONSTRAINTS;
+
+    DELETE FROM USER_SDO_G_SIDUM_METADATA
+    WHERE TABLE_NAME = 'CORRECTION_ILTASEU';
+    COMMIT;
+
+    DROP TABLE G_SIDU.CORRECTION_ILTASIT CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_ILTAFILIA CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_VOIEVOI CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_VOIECVT CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_TYPEVOIE CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_RUE CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_RUELPU CASCADE CONSTRAINTS;
+
+    DROP TABLE G_SIDU.CORRECTION_RUEVOIE CASCADE CONSTRAINTS;
+    */
+
+-- Création d'une table temporaire de correction pour ILTATRC
+-- 1. Création de la table CORRECTION_ILTATRC
+    CREATE TABLE G_SIDU.CORRECTION_ILTATRC
+    AS (SELECT * FROM G_SIDU.ILTATRC);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTATRC IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTATRC permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CDTDTRC IS 'Date de début de validité (date chantier ou du jour)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CDTFTRC IS 'Date de fin de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CDTMTRC IS 'Date de mise à jour';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CDTSTRC IS 'Date de saisie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CDVALTRO IS 'Validité (V ou F)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CGEOTRC IS 'Géomètrie (nouille) Perdu depuis la nouvelle appli';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CLNGTRC IS 'Longueur troncon';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.CNUMTRC IS 'Numéro de troncon';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.GEOM IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTATRC.TEMP IS 'Utilisé par l''appli (0 ou 1; question de maj)';
+
+-- Création d'une table temporaire de correction pour ILTAPTZ
+-- 1. Création de la table CORRECTION_ILTAPTZ
+    CREATE TABLE G_SIDU.CORRECTION_ILTAPTZ
+    AS (SELECT * FROM G_SIDU.ILTAPTZ);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTAPTZ IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTAPTZ permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CDTDPTZ IS 'date de début de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CDTFPTZ IS 'date de fin de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CDTMPTZ IS 'date de maj';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CDTSPTZ IS 'date de saisie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CDVALPTZ IS 'validité noeud';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CNUMPTZ IS 'numéro du noeud (carrefour)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CTYPCAR IS '#esc(type de carrefour (N:pas de maj; * : nb de tr))#';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CXLAPTZ IS 'xlamb 1 (plus utilisé avec la nouvelle appli)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.CYLAPTZ IS 'ylamb 1 (plus utilisé avec la nouvelle appli)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.GEOM IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAPTZ.TEMP IS 'champ temporaire (utilisé par l''appli)';
+
+-- Création d'une table temporaire de correction pour ILTADTN
+-- 1. Création de la table CORRECTION_ILTADTN
+    CREATE TABLE G_SIDU.CORRECTION_ILTADTN
+    AS (SELECT * FROM G_SIDU.ILTADTN);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTADTN IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTADTN permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CANGTRC IS 'angle de troncon (trigo)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CCODDFT IS 'relation noeud et sens tr';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CDTDDTN IS 'date de début de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CDTFDTN IS 'date de fin de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CDTMDTN IS 'date de modification';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CDTSDTN IS 'date de saisie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CDVALDTN IS 'validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CNUMPTZ IS 'numéro de noeud';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTADTN.CNUMTRC IS 'numéro de tr';
+
+-- Création d'une table temporaire de correction pour ILTALPU
+-- 1. Création de la table CORRECTION_ILTALPU
+    CREATE TABLE G_SIDU.CORRECTION_ILTALPU
+    AS (SELECT * FROM G_SIDU.ILTALPU);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTALPU IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTALPU permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDLPU IS 'code de conformité avec la commune (R: conforme à ta_rue)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDSFAMILLE IS 'code famille lpu';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDSNIV IS 'code niveau (voir bernard)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDTDLPU IS 'date début validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDTFLPU IS 'date fin de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDTMLPU IS 'date de modif du lpu';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDTSLPU IS 'date de saisie du lpu';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CDVALLPU IS 'code validité (V: valide; I: invalide)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CINFOS IS 'complément d''info';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CLEF_ORIGINE IS 'clé du fichier d''origine';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CLIBLPU IS 'libellé lpu';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CLIBLPU1 IS 'libellé lpu court';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CNUMCOM IS 'code insee';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CNUMFILS IS 'numéro du lpu fils';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CNUMLPU IS 'numéro de LPU';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CNUMPERE IS 'numéro du lpu pere';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CXLALPU IS 'xlamb 1; plus utilisé';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.CYLALPU IS 'ylamb 1; plus utilisé';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.ECRIRE_LIEU IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.GEOM IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.HTML IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.IMPORTANCE IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.LIBELLE_COURT IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.ORIGINE IS 'origine de l''info (LPU: table courante; COM : fichier commerce ...)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.PREFIXE_COURT IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.PREFIXE_LIBELLE IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.SYMBOLE_APACS IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.SYMBOLE_LIEU IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTALPU.URL IS '';
+
+-- Création d'une table temporaire de correction pour ILTASEU
+-- 1. Création de la table CORRECTION_ILTASEU
+    CREATE TABLE G_SIDU.CORRECTION_ILTASEU
+    AS (SELECT * FROM G_SIDU.ILTASEU);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTASEU IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTASEU permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CCODCONT IS 'non utilisé';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CDCOTE IS 'code côté rue (Gauche / Droit)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CDTMSEUIL IS 'date de modification du seuil';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CDTSSEUIL IS 'date de saisie du seuil';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CNUMCOM IS 'code insee';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CNUMTRC IS 'numéro de tr';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CXLACEN IS 'xlamb 1 centre bati (plus utilisé)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CXLAFAC IS 'xlamb 1 facade (plus utilisé)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CXLATRC IS 'xlamb 1 projection tr (plus utilisé)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CYLACEN IS 'ylamb 1 centre bati (plus utilisé)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CYLAFAC IS 'ylamb 1 facade (plus utilisé)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.CYLATRC IS 'ylamb 1 projection tr (plus utilisé)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.GEOM IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.IDSEUI IS 'clé primaire';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.NPARCELLE IS 'n° parcelle ';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.NSSEUI IS 'complément numéro de seuil';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASEU.NUSEUI IS 'numéro de seuil';
+
+-- Création d'une table temporaire de correction pour ILTASIT
+-- 1. Création de la table CORRECTION_ILTASIT
+    CREATE TABLE G_SIDU.CORRECTION_ILTASIT
+    AS (SELECT * FROM G_SIDU.ILTASIT);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTASIT IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTASIT permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASIT.CDCOTE IS 'code côté (Gauche / Droit)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASIT.CNUMTRC IS 'numéro de tr';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASIT.IDSEUI IS 'clé de seuil';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTASIT.NBABSCIS IS 'Abscisse curviligne';
+
+-- Création d'une table temporaire de correction pour ILTAFILIA
+-- 1. Création de la table CORRECTION_ILTAFILIA
+    CREATE TABLE G_SIDU.CORRECTION_ILTAFILIA
+    AS (SELECT * FROM G_SIDU.ILTAFILIA);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_ILTAFILIA IS 'TABLE A NE PAS UTILISER. Duplicatat de la table ILTAFILIA permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAFILIA.CDTMFILIA IS 'date de modification';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAFILIA.CDTSFILIA IS 'date de saisie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAFILIA.CNUMTRC IS 'Numéro de troncon';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAFILIA.OPERATION IS 'Code operation (c: coupé; d: detruit)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_ILTAFILIA.TRCPERE IS 'Troncon pere';
+
+-- Création d'une table temporaire de correction pour VOIEVOI
+-- 1. Création de la table CORRECTION_VOIEVOI
+    CREATE TABLE G_SIDU.CORRECTION_VOIEVOI
+    AS (SELECT * FROM G_SIDU.VOIEVOI);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_VOIEVOI IS 'TABLE A NE PAS UTILISER. Duplicatat de la table VOIEVOI permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CCODRVO IS 'code rivolo';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CCODTVO IS 'type de voie (voir table typevoie)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CCOMVOI IS 'numéro de voie (commence par code insee)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDPARITE IS 'code droit commune';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDRUE IS 'conformité avec ta_rue (validé par la commune; aujourdh''ui Lille / Lomme / Hellemmes)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDTDVOI IS 'date de début de la voie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDTFVOI IS 'date de fin de la voie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDTMVOI IS 'date de modif';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDTRVOI IS 'date ?';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDTSVOI IS 'date de saisie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CDVALVOI IS 'validation de la voie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CGPARITE IS 'code gauche commune';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CINFOS IS 'complément du non de voie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CMUTDEB IS 'plus utilisé mais rempli';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CMUTFIN IS 'plus utilisé mais rempli';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CNOMINUS IS 'nom de voie en miniscule';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CNOMVOI IS 'nom de la voie avec complément';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CNOMVOI1 IS 'nom de la voie sans compléménet';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CNOMVOI2 IS 'ancien nom de la voie avec complément';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.CNUMCOM IS 'code insee';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIEVOI.GENRE IS 'Genre du nom de la voie : M => Masculin | F => Féminin | N => Neutre | C => Couple | NI => Non identifié';
+
+-- Création d'une table temporaire de correction pour VOIECVT
+-- 1. Création de la table CORRECTION_VOIECVT
+    CREATE TABLE G_SIDU.CORRECTION_VOIECVT
+    AS (SELECT * FROM G_SIDU.VOIECVT);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_VOIECVT IS 'TABLE A NE PAS UTILISER. Duplicatat de la table VOIECVT permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU. CORRECTION_VOIECVT.CCODRVO IS 'code rivolo';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CCODSTR IS  'code sens troncon';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CCOMVOI IS  'numéro de voie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CDCOTE  IS  'code coté (en rapport avec la commune)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CDTDCVT IS  'date début validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CDTFCVT IS  'date fin de validité';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CDTMCVT IS  'date de modif ';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CDTSCVT IS  'date de saisie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CMUTDEB IS  'mutation; par défaut 1; plus utilsé';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CMUTFIN IS  'mutation; par défaut 2; plus utilsé';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CNUMCOM IS  'code insee';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CNUMTRC IS  'numéro de tr';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CNUMTRV IS  'ordre des troncons' ;
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CVALIDE IS  'validité (V: valide ou I:invalide)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CVOFTRD IS  '?';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_VOIECVT.CVOFTRF IS  '?';
+
+-- Création d'une table temporaire de correction pour TYPEVOIE
+-- 1. Création de la table CORRECTION_TYPEVOIE
+    CREATE TABLE G_SIDU.CORRECTION_TYPEVOIE
+    AS (SELECT * FROM G_SIDU.TYPEVOIE);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_TYPEVOIE IS 'TABLE A NE PAS UTILISER. Duplicatat de la table TYPEVOIE permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_TYPEVOIE.CCODTVO IS 'code type voie (voir même champ dans table voievoi)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_TYPEVOIE.CDCLATVO IS 'classe type voie (importance de la voie) ';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_TYPEVOIE.LITYVOIE IS 'libellé type voie';
+
+-- Création d'une table temporaire de correction pour TA_RUE
+-- 1. Création de la table CORRECTION_TA_RUE
+    CREATE TABLE G_SIDU.CORRECTION_RUE
+    AS (SELECT * FROM G_SIDU.TA_RUE);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_RUE IS 'TABLE A NE PAS UTILISER. Duplicatat de la table TA_RUE permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUE.CCODTVO IS  'code type de voie';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUE.CLIBRUE IS  'libellé rue (imposé par la communes)';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUE.CNOMINUS IS  'nom de rue miniscule';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUE.CNUMCOM IS  'code insee';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUE.FANTOIR IS  'code fantoir / rivolo';
+
+-- Création d'une table temporaire de correction pour TA_RUELPU
+-- 1. Création de la table CORRECTION_TA_RUELPU
+    CREATE TABLE G_SIDU.CORRECTION_RUELPU
+    AS (SELECT * FROM G_SIDU.TA_RUELPU);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_RUELPU IS 'TABLE A NE PAS UTILISER. Duplicatat de la table TA_RUELPU permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    -- pas de commentaire de champs
+
+-- Création d'une table temporaire de correction pour TA_RUEVOIE
+-- 1. Création de la table CORRECTION_TA_RUEVOIE
+    CREATE TABLE G_SIDU.CORRECTION_RUEVOIE
+    AS (SELECT * FROM G_SIDU.TA_RUEVOIE);
+
+-- 2. Création des commentaires sur la table et les champs
+    COMMENT ON TABLE G_SIDU.CORRECTION_RUEVOIE IS 'TABLE A NE PAS UTILISER. Duplicatat de la table TA_RUEVOIE permettant de la corriger/améliorer avant sa migration sur MULTIT.';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUEVOIE.CCOMRUE IS 'code rivoli de la ville';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUEVOIE.CCOMVOIE IS '';
+    COMMENT ON COLUMN G_SIDU.CORRECTION_RUEVOIE.FANTOIR IS '';
