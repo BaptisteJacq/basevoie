@@ -54,6 +54,7 @@ GROUP BY
     f.date_modification,
     f.fid_pnom_saisie,
     f.fid_pnom_modification;
+-- Résultat : 17 816 lignes insérées.
 
 -- Insertion des libellés décrivant les états des objets du projet D
 INSERT INTO G_BASE_VOIE.TEMP_D_LIBELLE(libelle_court, libelle_long)
