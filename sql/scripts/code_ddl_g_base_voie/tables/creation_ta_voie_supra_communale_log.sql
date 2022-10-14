@@ -16,8 +16,8 @@ COMMENT ON TABLE G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG IS 'Table de log de la 
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG.objectid IS 'Clé primaire auto-incrémentée de la table.';
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG.id_voie IS 'Champ contenant les identifiants des voies supra-communales de la table TA_VOIE_SUPRA_COMMUNALE.';
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG.nom_voie IS 'Champ contenant les identifiants des voies supra-communales de la table SIREO_LEC.EXRD_ORDONNEE.';
-COMMENT ON COLUMN G_BASE_VOIE.TA_TRONCON_LOG.date_action IS 'date de saisie, modification et suppression des voies supra-communales.';
-COMMENT ON COLUMN G_BASE_VOIE.TA_TRONCON_LOG.fid_type_action IS 'Clé étrangère vers la table TA_LIBELLE permettant de catégoriser le type d''action effectué sur les voies supra-communales.';
+COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG.date_action IS 'date de saisie, modification et suppression des voies supra-communales.';
+COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG.fid_type_action IS 'Clé étrangère vers la table TA_LIBELLE permettant de catégoriser le type d''action effectué sur les voies supra-communales.';
 
 -- 3. Création de la clé primaire
 ALTER TABLE G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG 
@@ -27,7 +27,7 @@ USING INDEX TABLESPACE "G_ADT_INDX";
 
 -- 4. Création des clés étrangères
 ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE_LOG
-ADD CONSTRAINT TA_VOIE_ADMINISTRATIVE_LOG_FID_TYPE_ACTION_FK
+ADD CONSTRAINT TA_VOIE_SUPRA_COMMUNALE_LOG_FID_TYPE_ACTION_FK
 FOREIGN KEY (fid_type_action)
 REFERENCES G_BASE_VOIE.TA_TYPE_VOIE(objectid);
 

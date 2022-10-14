@@ -1,9 +1,9 @@
 /*
-Déclencheur permettant de récupérer dans la table TA_VOIE, les dates de création/modification des entités ainsi que le pnom de l'agent les ayant effectués.
+Déclencheur permettant de récupérer dans la table TA_VOIE_ADMINISTRATIVE, les dates de création/modification des entités ainsi que le pnom de l'agent les ayant effectués.
 */
 
-CREATE OR REPLACE TRIGGER G_BASE_VOIE.B_IUX_TA_VOIE_DATE_PNOM
-BEFORE INSERT OR UPDATE ON G_BASE_VOIE.TA_VOIE
+CREATE OR REPLACE TRIGGER G_BASE_VOIE.B_IUX_TA_VOIE_ADMINISTRATIVE_DATE_PNOM
+BEFORE INSERT OR UPDATE ON G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE
 FOR EACH ROW
 DECLARE
     username VARCHAR2(100);
@@ -32,7 +32,7 @@ BEGIN
 
     EXCEPTION
         WHEN OTHERS THEN
-            mail.sendmail('bjacq@lillemetropole.fr',SQLERRM,'ERREUR TRIGGER - B_IUX_TA_VOIE_DATE_PNOM','bjacq@lillemetropole.fr');
+            mail.sendmail('bjacq@lillemetropole.fr',SQLERRM,'ERREUR TRIGGER - B_IUX_TA_VOIE_ADMINISTRATIVE_DATE_PNOM','bjacq@lillemetropole.fr');
 END;
 
 /

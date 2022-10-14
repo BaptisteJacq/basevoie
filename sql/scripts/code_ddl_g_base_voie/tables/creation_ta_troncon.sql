@@ -1,5 +1,5 @@
 /*
-La table TA_TRONCON - du projet C de correction de la latéralité des voies - regroupe tous les tronçons de la base voie.
+La table TA_TRONCON regroupe tous les tronçons de la base voie.
 */
 
 -- 1. Création de la table TA_TRONCON
@@ -87,7 +87,7 @@ CREATE INDEX TA_TRONCON_FID_ETAT_IDX ON G_BASE_VOIE.TA_TRONCON(fid_etat)
 CREATE INDEX TA_TRONCON_FID_VOIE_PHYSIQUE_IDX ON G_BASE_VOIE.TA_TRONCON(fid_voie_physique)
     TABLESPACE G_ADT_INDX;
 
-CREATE INDEX TA_TRONCON_FID_VOIE_PHYSIQUE_IDX ON G_BASE_VOIE.TA_TRONCON(ordre_troncon)
+CREATE INDEX TA_TRONCON_ORDRE_TRONCON_IDX ON G_BASE_VOIE.TA_TRONCON(ordre_troncon)
     TABLESPACE G_ADT_INDX;
 
 -- Cet index dispose d'une fonction permettant d'accélérer la récupération du code INSEE de la commune d'appartenance du tronçon. 
