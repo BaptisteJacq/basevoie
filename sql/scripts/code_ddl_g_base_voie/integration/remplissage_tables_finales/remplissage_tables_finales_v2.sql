@@ -1,129 +1,323 @@
--- Insertion des pnoms des agents
-INSERT INTO G_BASE_VOIE.TA_AGENT(numero_agent, pnom, validite)
-    SELECT numero_agent, pnom, validite FROM TEMP_C_AGENT;
--- Résultat : 5 lignes insérées.
+SET SERVEROUTPUT ON
+DECLARE
+    v_nbr_objectid NUMBER(38,0);
+    v_contrainte VARCHAR2(100);
+    v_mtd NUMBER(38,0);
+BEGIN
 
--- Insertion des types de voie
-MERGE INTO G_BASE_VOIE.TA_TYPE_VOIE a
-    USING(
-        SELECT
-            objectid,
-            code_type_voie,
-            libelle
-        FROM
-            G_BASE_VOIE.TEMP_C_TYPE_VOIE
-    )t
-    ON(a.code_type_voie = t.code_type_voie AND a.libelle = t.libelle)
-WHEN NOT MATCHED THEN
-    INSERT(a.objectid, a.code_type_voie, a.libelle)
-    VALUES(t.objectid, t.code_type_voie, t.libelle);
--- Résultat : 57 lignes fusionnées.
+    SAVEPOINT POINT_SAUVEGARDE_REMPLISSAGE;
 
--- Insertion des valeurs de latéralité des voies dans TA_LIBELLE
-INSERT INTO G_BASE_VOIE.TA_LIBELLE(objectid, libelle_court, libelle_long)
-SELECT
-    objectid,
-    libelle_court,
-    libelle_long
-FROM
-    G_BASE_VOIE.TEMP_C_LIBELLE
-WHERE
-    libelle_court IN('droit', 'gauche', 'les deux côtés');
--- Résultat : 3 lignes fusionnées
+    /*
+    Désactivation des contraitnes, index, triggers avant l'insertion.
+    */
 
--- Insertion des relations tronçons / voies physiques pour lesquelles un tronçon est affecté à plusieurs voies physiques
-MERGE INTO G_BASE_VOIE.TA_TRONCON a
-    USING(
+    -- Suppression des contraintes des tables de production
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_TYPE_VOIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_GENRE_VOIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_METADONNEE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_LATERALITE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE DISABLE CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_VOIE_SUPRA_COMMUNALE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE DISABLE CONSTRAINT TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE_FID_VOIE_PHYSIQUE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE DISABLE CONSTRAINT TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE_FID_VOIE_ADMINISTRATIVE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_TRONCON DISABLE CONSTRAINT TA_TRONCON_SIDX';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_TRONCON DISABLE CONSTRAINT TA_TRONCON_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_TRONCON DISABLE CONSTRAINT TA_TRONCON_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_TRONCON DISABLE CONSTRAINT TA_TRONCON_FID_VOIE_PHYSIQUE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_SEUIL DISABLE CONSTRAINT TA_SEUIL_FID_TRONCON_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_SEUIL DISABLE CONSTRAINT TA_SEUIL_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_SEUIL DISABLE CONSTRAINT TA_SEUIL_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_INFOS_SEUIL DISABLE CONSTRAINT TA_INFOS_SEUIL_FID_SEUIL_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_INFOS_SEUIL DISABLE CONSTRAINT TA_INFOS_SEUIL_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_INFOS_SEUIL DISABLE CONSTRAINT TA_INFOS_SEUIL_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_HIERARCHISATION_VOIE DISABLE CONSTRAINT TA_HIERARCHISATION_VOIE_FID_VOIE_PRINCIPALE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_HIERARCHISATION_VOIE DISABLE CONSTRAINT TA_HIERARCHISATION_VOIE_FID_VOIE_SECONDAIRE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_VOIE_SUPRA_COMMUNALE_LOG DISABLE CONSTRAINT TA_VOIE_SUPRA_COMMUNALE_LOG_FID_TYPE_ACTION_FK';
+
+    -- Suppression des index des tables de production
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_PNOM_SAISIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_PNOM_MODIFICATION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_TYPE_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_GENRE_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_RIVOLI_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_METADONNEE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_FID_VOIE_SUPRA_COMMUNALE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_ID_VOIE_SUPRA_COMMUNALE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_FID_PNOM_SAISIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_FID_PNOM_MODIFICATION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_FID_TYPE_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_FID_GENRE_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_FID_RIVOLI_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_ADMINISTRATIVE_LOG_FID_METADONNEE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_PHYSIQUE_LOG_ID_VOIE_PHYSIQUE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_TRONCON_FID_PNOM_SAISIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_TRONCON_FID_PNOM_MODIFICATION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_TRONCON_FID_METADONNEE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_TRONCON_FID_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_TRONCON_SIDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_SEUIL_FID_TRONCON_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_SEUIL_FID_PNOM_SAISIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_SEUIL_FID_PNOM_MODIFICATION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_SEUIL_SIDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE_FID_VOIE_PHYSIQUE_IDX'; 
+    EXECUTE IMMEDIATE 'DROP INDEX TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE_FID_VOIE_ADMINISTRATIVE_IDX'; 
+    EXECUTE IMMEDIATE 'DROP INDEX TA_HIERARCHISATION_VOIE_FID_VOIE_PRINCIPALE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_HIERARCHISATION_VOIE_FID_VOIE_SECONDAIRE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_NOM_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_DATE_SAISIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_DATE_MODIFICATION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_LOG_ID_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_LOG_NOM_VOIE_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_LOG_DATE_ACTION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_VOIE_SUPRA_COMMUNALE_LOG_FID_TYPE_ACTION_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_RIVOLI_CODE_RIVOLI_IDX';
+    EXECUTE IMMEDIATE 'DROP INDEX TA_RIVOLI_CLE_CONTROLE_IDX';
+
+    -- Désactivation des triggers des tables de production
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TA_TRONCON_LOG DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_TRONCON_DATE_PNOM DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_TRONCON_DATE_PNOM DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_INFOS_SEUIL_DATE_PNOM DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TA_INFOS_SEUIL_LOG DISABLE';    
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TA_SEUIL_LOG DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_SEUIL_DATE_PNOM DISABLE';  
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_POINT_INTERET_DATE_PNOM DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TA_POINT_INTERET_LOG DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TA_INFOS_POINT_INTERET_LOG DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_INFOS_POINT_INTERET_DATE_PNOM DISABLE';    
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TA_VOIE_ADMINISTRATIVE_DATE_PNOM DISABLE';
+
+    /*
+    Insertion des données
+    */
+    -- Insertion des pnoms des agents
+    INSERT INTO G_BASE_VOIE.TEMP_E_AGENT(numero_agent, pnom, validite)
+        SELECT numero_agent, pnom, validite FROM TEMP_C_AGENT;
+    -- Résultat : 5 lignes insérées.
+
+    -- Insertion des types de voie
+    MERGE INTO G_BASE_VOIE.TEMP_E_TYPE_VOIE a
+        USING(
             SELECT
-                fid_troncon,
+                objectid,
+                code_type_voie,
+                libelle
+            FROM
+                G_BASE_VOIE.TEMP_C_TYPE_VOIE
+        )t
+        ON(a.code_type_voie = t.code_type_voie AND a.libelle = t.libelle)
+    WHEN NOT MATCHED THEN
+        INSERT(a.objectid, a.code_type_voie, a.libelle)
+        VALUES(t.objectid, t.code_type_voie, t.libelle);
+    -- Résultat : 57 lignes fusionnées.
+
+    -- Insertion des valeurs de latéralité des voies dans TEMP_E_LIBELLE
+    INSERT INTO G_BASE_VOIE.TEMP_E_LIBELLE(objectid, libelle_court, libelle_long)
+    SELECT
+        objectid,
+        libelle_court,
+        libelle_long
+    FROM
+        G_BASE_VOIE.TEMP_C_LIBELLE
+    WHERE
+        libelle_court IN('droit', 'gauche', 'les deux côtés');
+    -- Résultat : 3 lignes fusionnées
+
+    -- Insertion des relations tronçons / voies physiques pour lesquelles un tronçon est affecté à plusieurs voies physiques
+    MERGE INTO G_BASE_VOIE.TEMP_E_TRONCON a
+        USING(
+                SELECT
+                    b.objectid,
+                    b.geom, 
+                    b.date_saisie, 
+                    b.date_modification, 
+                    b.fid_pnom_saisie, 
+                    b.fid_pnom_modification,
+                    a.fid_voie_physique
+                FROM
+                    G_BASE_VOIE.TEMP_C_RELATION_TRONCON_VOIE_PHYSIQUE a
+                    INNER JOIN G_BASE_VOIE.TEMP_C_TRONCON b ON b.objectid = a.fid_troncon
+        )t
+    ON(a.fid_voie_physique = t.fid_voie_physique AND a.objectid = t.objectid)
+    WHEN NOT MATCHED THEN
+        INSERT(a.fid_voie_physique, a.objectid, a.geom, a.date_saisie, a.date_modification, a.fid_pnom_saisie, a.fid_pnom_modification)
+        VALUES(t.fid_voie_physique, t.objectid, t.geom, t.date_saisie, t.date_modification, t.fid_pnom_saisie, t.fid_pnom_modification);
+    -- Résultat : 50 428 lignes fusionnées
+
+    -- Insertion des voies physiques
+    MERGE INTO G_BASE_VOIE.TEMP_E_VOIE_PHYSIQUE a
+        USING(
+                SELECT
+                    a.objectid
+                FROM
+                  G_BASE_VOIE.TEMP_C_VOIE_PHYSIQUE a
+            )t
+    ON(a.objectid = t.objectid)
+    WHEN NOT MATCHED THEN
+        INSERT(a.objectid)
+        VALUES(t.objectid);
+    -- Résultat : 22 934  lignes fusionnées.
+
+    -- Insertion des relations voies physiques / voies administratives
+    MERGE INTO G_BASE_VOIE.TEMP_E_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE a
+        USING(
+            SELECT
+                fid_voie_administrative,
                 fid_voie_physique
             FROM
-                G_BASE_VOIE.TEMP_C_RELATION_TRONCON_VOIE_PHYSIQUE
-    )t
-ON(a.fid_voie_physique = t.fid_voie_physique AND a.fid_troncon = t.fid_troncon)
-WHEN NOT MATCHED THEN
-    INSERT(a.fid_voie_physique, a.fid_troncon, a.old_id_voie_physique)
-    VALUES(t.fid_voie_physique, t.fid_troncon, t.fid_voie_physique);
--- Résultat : 51 248 lignes fusionnées
-
--- Insertion des tronçons
-MERGE INTO G_BASE_VOIE.TA_TRONCON a
-    USING(
-        SELECT
-            a.objectid, 
-            a.geom, 
-            a.date_saisie, 
-            a.date_modification, 
-            a.fid_pnom_saisie, 
-            a.fid_pnom_modification
-        FROM
-          G_BASE_VOIE.TEMP_B_TRONCON a
-          INNER JOIN (SELECT DISTINCT fid_troncon FROM G_BASE_VOIE.TA_RELATION_TRONCON_VOIE_PHYSIQUE) b ON b.fid_troncon = a.objectid
-    )t
-ON(a.objectid = t.objectid)
-WHEN NOT MATCHED THEN
-    INSERT(a.objectid, a.geom, a.date_saisie, a.date_modification, a.fid_pnom_saisie, a.fid_pnom_modification)
-    VALUES(t.objectid, t.geom, t.date_saisie, t.date_modification, t.fid_pnom_saisie, t.fid_pnom_modification);
--- Résultat : 50 411 lignes fusionnées.
-
--- Insertion des voies physiques
-MERGE INTO G_BASE_VOIE.TA_VOIE_PHYSIQUE a
-    USING(
-            SELECT
-                a.objectid
-            FROM
-              G_BASE_VOIE.TEMP_B_VOIE_PHYSIQUE a
+                G_BASE_VOIE.TEMP_C_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE 
         )t
-ON(a.objectid = t.objectid)
-WHEN NOT MATCHED THEN
-    INSERT(a.objectid)
-    VALUES(t.objectid);
--- Résultat : 22 112  lignes fusionnées.
+    ON(a.fid_voie_administrative = t.fid_voie_administrative AND a.fid_voie_physique = t.fid_voie_physique)
+    WHEN NOT MATCHED THEN
+        INSERT(a.fid_voie_administrative, a.fid_voie_physique)
+        VALUES(t.fid_voie_administrative, t.fid_voie_physique);
+    -- Résultat : 23 652 lignes fusionnées.
 
--- Insertion des relations voies physiques / voies administratives
-MERGE INTO G_BASE_VOIE.TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE a
-    USING(
-        SELECT
-            a.objectid AS fid_voie_administrative,
-            a.fid_voie_physique
-        FROM
-            G_BASE_VOIE.TEMP_B_VOIE_ADMINISTRATIVE a
-            INNER JOIN G_BASE_VOIE.TA_VOIE_PHYSIQUE b ON b.objectid = a.fid_voie_physique
-    )t
-ON(a.fid_voie_administrative = t.fid_voie_administrative AND a.fid_voie_physique = t.fid_voie_physique)
-WHEN NOT MATCHED THEN
-    INSERT(a.fid_voie_administrative, a.fid_voie_physique, a.old_id_voie_physique)
-    VALUES(t.fid_voie_administrative, t.fid_voie_physique, t.fid_voie_physique);
--- Résultat : 22 165 lignes fusionnées.
+    -- Insertion des voies supra-communales
+    MERGE INTO G_BASE_VOIE.TEMP_E_VOIE_SUPRA_COMMUNALE a
+        USING(
+            SELECT DISTINCT
+                idsupvoi AS nom_voie,
+                TO_DATE(sysdate, 'dd/mm/yy') AS date_saisie,
+                TO_DATE(sysdate, 'dd/mm/yy') AS date_modification
+            FROM
+                SIREO_LEC.EXRD_ORDONNEE
+        )t
+    ON(a.nom_voie = t.nom_voie)
+    WHEN NOT MATCHED THEN
+        INSERT(a.nom_voie, a.date_saisie, a.date_modification)
+        VALUES(t.nom_voie, t.date_saisie, t.date_modification);
+    COMMIT;
+    -- Résultat : lignes fusionnées
 
--- Insertion des voies administratives
-MERGE INTO G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE a
-    USING(
-        SELECT
-            a.OBJECTID,
-            a.GENRE_VOIE,
-            a.LIBELLE_VOIE,
-            a.COMPLEMENT_NOM_VOIE,
-            a.FID_LATERALITE,
-            a.CODE_INSEE,
-            a.DATE_SAISIE,
-            a.DATE_MODIFICATION,
-            a.FID_PNOM_SAISIE,
-            a.FID_PNOM_MODIFICATION,
-            a.FID_TYPE_VOIE
-        FROM
-            G_BASE_VOIE.TEMP_B_VOIE_ADMINISTRATIVE a
-            INNER JOIN G_BASE_VOIE.TA_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE b ON b.fid_voie_administrative = a.objectid
-    )t
-ON(a.objectid = t.objectid AND a.fid_type_voie = t.fid_type_voie)
-WHEN NOT MATCHED THEN
-    INSERT(a.objectid, a.libelle_voie, a.complement_nom_voie, a.code_insee, a.fid_type_voie, a.date_saisie, a.date_modification, a.fid_pnom_saisie, a.fid_pnom_modification, a.fid_lateralite)
-    VALUES(t.objectid, t.libelle_voie, t.complement_nom_voie, t.code_insee, t.fid_type_voie, t.date_saisie, t.date_modification, t.fid_pnom_saisie, t.fid_pnom_modification, t.fid_lateralite);
-COMMIT;
--- Résultat : 22 165 lignes fusionnées.
+    -- Insertion des voies administratives
+    MERGE INTO G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE a
+        USING(
+            SELECT DISTINCT
+                a.OBJECTID,
+                a.GENRE_VOIE,
+                a.LIBELLE_VOIE,
+                a.COMPLEMENT_NOM_VOIE,
+                a.FID_LATERALITE,
+                a.CODE_INSEE,
+                a.DATE_SAISIE,
+                a.DATE_MODIFICATION,
+                a.FID_PNOM_SAISIE,
+                a.FID_PNOM_MODIFICATION,
+                a.FID_TYPE_VOIE
+            FROM
+                G_BASE_VOIE.TEMP_C_VOIE_ADMINISTRATIVE a/*
+                INNER JOIN SIREO_LEC.EXRD_ORDONNEE b ON b.ccomvoi = a.objectid
+                INNER JOIN G_BASE_VOIE.TEMP_E_VOIE_SUPRA_COMMUNALE c ON c.nom_voie = b.idsupvoi*/
+        )t
+    ON(a.objectid = t.objectid AND a.fid_type_voie = t.fid_type_voie)
+    WHEN NOT MATCHED THEN
+        INSERT(a.objectid, a.libelle_voie, a.complement_nom_voie, a.code_insee, a.fid_type_voie, a.date_saisie, a.date_modification, a.fid_pnom_saisie, a.fid_pnom_modification, a.fid_lateralite)
+        VALUES(t.objectid, t.libelle_voie, t.complement_nom_voie, t.code_insee, t.fid_type_voie, t.date_saisie, t.date_modification, t.fid_pnom_saisie, t.fid_pnom_modification, t.fid_lateralite);
+    COMMIT;
+    -- Résultat : 22 165 lignes fusionnées.
 
--- Insertion des 
+    -- Insertion des relations voies administratives / voies supra-communales
+    INSERT INTO G_BASE_VOIE.TEMP_E_RELATION_VOIE_ADMINISTRATIVE_SUPRA_COMMUNALE(fid_voie_administrative, fid_voie_supra_communale)
+    SELECT DISTINCT
+        a.objectid AS fid_voie_administrative,
+        c.objectid AS fid_voie_supra_communale
+    FROM
+        G_BASE_VOIE.TEMP_C_VOIE_ADMINISTRATIVE a
+        INNER JOIN SIREO_LEC.EXRD_ORDONNEE b ON b.ccomvoi = a.objectid
+        INNER JOIN G_BASE_VOIE.TEMP_E_VOIE_SUPRA_COMMUNALE c ON c.nom_voie = b.idsupvoi;
+    COMMIT;
+    -- Résultat : 1 411 lignes insérées.        
+            
+    -- Insertion des relations voies principales/voies secondaires
+    MERGE INTO G_BASE_VOIE.TEMP_E_HIERARCHISATION_VOIE a
+        USING(
+            SELECT
+                fid_voie_principale,
+                fid_voie_secondaire
+            FROM
+                G_BASE_VOIE.TA_HIERARCHISATION_VOIE
+            WHERE
+                fid_voie_principale <> 1969424
+        )t
+    ON(a.fid_voie_principale = t.fid_voie_principale AND a.fid_voie_secondaire = t.fid_voie_secondaire)
+    WHEN NOT MATCHED THEN
+        INSERT(a.fid_voie_principale, a.fid_voie_secondaire)
+        VALUES(t.fid_voie_principale, t.fid_voie_secondaire);
+    COMMIT;
+    -- Résultat : 4 335 lignes fusionnées.
 
+    /*
+    Réactivation des contraintes, index, triggers
+    */
+    -- 41. Réactivation de tous les triggers désactivés au cours de la procédure
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TEMP_E_POINT_INTERET_LOG ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TEMP_E_TRONCON_LOG ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TEMP_E_SEUIL_LOG ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TEMP_E_SEUIL_DATE_PNOM ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TEMP_E_INFOS_SEUIL_LOG ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TEMP_E_INFOS_SEUIL_DATE_PNOM ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TEMP_E_POINT_INTERET_DATE_PNOM ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUD_TEMP_E_INFOS_POINT_INTERET_LOG ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER B_IUX_TEMP_E_INFOS_POINT_INTERET_DATE_PNOM ENABLE';
+
+    -- 42 Réactivation des contraintes
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_VOIE_ADMINISTRATIVE_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_VOIE_ADMINISTRATIVE_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_VOIE_ADMINISTRATIVE_FID_TYPE_VOIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_VOIE_ADMINISTRATIVE_FID_GENRE_VOIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_VOIE_ADMINISTRATIVE_FID_METADONNEE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_VOIE_ADMINISTRATIVE_FID_LATERALITE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE_FID_VOIE_PHYSIQUE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE ENABLE CONSTRAINT TEMP_E_RELATION_VOIE_PHYSIQUE_ADMINISTRATIVE_FID_VOIE_ADMINISTRATIVE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_TRONCON ENABLE CONSTRAINT TEMP_E_TRONCON_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_TRONCON ENABLE CONSTRAINT TEMP_E_TRONCON_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_TRONCON ENABLE CONSTRAINT TEMP_E_TRONCON_FID_VOIE_PHYSIQUE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_SEUIL ENABLE CONSTRAINT TEMP_E_SEUIL_FID_TRONCON_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_SEUIL ENABLE CONSTRAINT TEMP_E_SEUIL_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_SEUIL ENABLE CONSTRAINT TEMP_E_SEUIL_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_INFOS_SEUIL ENABLE CONSTRAINT TEMP_E_INFOS_SEUIL_FID_SEUIL_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_INFOS_SEUIL ENABLE CONSTRAINT TEMP_E_INFOS_SEUIL_FID_PNOM_SAISIE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_INFOS_SEUIL ENABLE CONSTRAINT TEMP_E_INFOS_SEUIL_FID_PNOM_MODIFICATION_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_HIERARCHISATION_VOIE ENABLE CONSTRAINT TEMP_E_HIERARCHISATION_VOIE_FID_VOIE_PRINCIPALE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_HIERARCHISATION_VOIE ENABLE CONSTRAINT TEMP_E_HIERARCHISATION_VOIE_FID_VOIE_SECONDAIRE_FK';
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TEMP_E_VOIE_SUPRA_COMMUNALE_LOG ENABLE CONSTRAINT TEMP_E_VOIE_SUPRA_COMMUNALE_LOG_FID_TYPE_ACTION_FK';
+
+    -- 43. Recréation des index
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_VOIE_ADMINISTRATIVE_FID_PNOM_SAISIE_IDX ON G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE(fid_pnom_saisie) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_VOIE_ADMINISTRATIVE_FID_PNOM_MODIFICATION_IDX ON G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE(fid_pnom_modification) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_VOIE_ADMINISTRATIVE_FID_TYPEVOIE_IDX ON G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE(fid_type_voie) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_VOIE_ADMINISTRATIVE_FID_GENRE_VOIE_IDX ON G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE(fid_genre_voie) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_VOIE_ADMINISTRATIVE_FID_METADONNEE_IDX ON G_BASE_VOIE.TEMP_E_VOIE_ADMINISTRATIVE(fid_metadonnee) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_TRONCON_FID_PNOM_SAISIE_IDX ON G_BASE_VOIE.TEMP_E_TRONCON(fid_pnom_saisie) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_TRONCON_FID_PNOM_MODIFICATION_IDX ON G_BASE_VOIE.TEMP_E_TRONCON(fid_pnom_modification) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_TRONCON_FID_VOIE_PHYSIQUE_IDX ON G_BASE_VOIE.TEMP_E_TRONCON(fid_voie_physique) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_SEUIL_FID_PNOM_SAISIE_IDX ON G_BASE_VOIE.TEMP_E_SEUIL(fid_pnom_saisie) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_SEUIL_FID_PNOM_MODIFICATION_IDX ON G_BASE_VOIE.TEMP_E_SEUIL(fid_pnom_modification) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_SEUIL_FID_TRONCON_IDX ON G_BASE_VOIE.TEMP_E_SEUIL(fid_troncon) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_HIERARCHISATION_VOIE_FID_VOIE_PRINCIPALE_IDX ON G_BASE_VOIE.TEMP_E_HIERARCHISATION_VOIE(fid_voie_principale) TABLESPACE G_ADT_INDX';
+    EXECUTE IMMEDIATE 'CREATE INDEX TEMP_E_HIERARCHISATION_VOIE_FID_VOIE_SECONDAIRE_IDX ON G_BASE_VOIE.TEMP_E_HIERARCHISATION_VOIE(fid_voie_secondaire) TABLESPACE G_ADT_INDX';
+    
+    -- 44. Réactivation de la contrainte de non-nullité du champ TA_TYPE_VOIE.LIBELLE
+    SELECT
+        CONSTRAINT_NAME
+        INTO v_contrainte
+    FROM
+        USER_CONSTRAINTS
+    WHERE
+        TABLE_NAME = 'TA_TYPE_VOIE'
+        AND CONSTRAINT_TYPE = 'C'
+        AND SEARCH_CONDITION_VC LIKE '%LIBELLE%';
+
+    EXECUTE IMMEDIATE 'ALTER TABLE G_BASE_VOIE.TA_TYPE_VOIE ENABLE CONSTRAINT ' || v_contrainte;
+
+    -- En cas d'erreur une exception est levée et un rollback effectué, empêchant ainsi toute insertion de se faire et de retourner à l'état des tables précédent l'insertion.
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('L''erreur ' || SQLCODE || 'est survenue. Un rollback a été effectué : ' || SQLERRM(SQLCODE));
+            ROLLBACK TO POINT_SAUVEGARDE_REMPLISSAGE;
+END;
 ------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------- Vérification import des données -------------------------------------

@@ -16,7 +16,6 @@ CREATE TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE(
     fid_genre_voie NUMBER(38,0),
     fid_type_voie NUMBER(38,0),
     fid_lateralite NUMBER(38,0),
-    fid_voie_supra_communale NUMBER(38,0),
     fid_metadonnee NUMBER(38,0)
 );
 
@@ -34,7 +33,6 @@ COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE.fid_pnom_modification IS 'C
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE.fid_genre_voie IS 'Clé étrangère vers la table TA_LIBELLE permettant d''affecter un genre au nom de la voie (féminin, masculin, neutre, etc).';
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE.fid_type_voie IS 'Clé étrangère vers la table TA_TYPE_VOIE permettant d''associer une voie à un type de voie.';
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE.fid_lateralite IS 'Clé étrangère vers la table TA_LIBELLE permettant de récupérer la latéralité de la voie. En limite de commune le côté gauche de la voie physique peut appartenir à la commune A et le côté droit à la comune B, tandis qu''au sein de la commune la voie physique appartient à une et une seule commune et est donc affectée à une et une seule voie administrative. Cette distinction se fait grâce à ce champ.';
-COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE.fid_voie_supra_communale IS 'Clé étrangère vers la table TA_VOIE_SUPRA_COMMUNALE permettant d''associer une ou plusieurs voies administratives à une voie supra-communale, c-à-d une voie ne tenant pas compte des limites communales, telle que les voies métropolitaines et les autoroutes.';
 COMMENT ON COLUMN G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE.fid_metadonnee IS 'Clé étrangère vers la table G_GEO.TA_METADONNEE permettant de connaître la source des voies (MEL ou IGN).';
 
 -- 3. Création de la clé primaire
@@ -74,11 +72,6 @@ ADD CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_METADONNEE_FK
 FOREIGN KEY (fid_metadonnee)
 REFERENCES G_GEO.TA_METADONNEE(objectid);
 
-ALTER TABLE G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE
-ADD CONSTRAINT TA_VOIE_ADMINISTRATIVE_FID_VOIE_SUPRA_COMMUNALE_FK
-FOREIGN KEY (fid_voie_supra_communale)
-REFERENCES G_GEO.TA_METADONNEE(objectid);
-
 -- 4. Création des index sur les clés étrangères et autres   
 CREATE INDEX TA_VOIE_ADMINISTRATIVE_LIBELLE_VOIE_IDX ON G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE(libelle_voie)
     TABLESPACE G_ADT_INDX;
@@ -105,9 +98,6 @@ CREATE INDEX TA_VOIE_ADMINISTRATIVE_FID_GENRE_VOIE_IDX ON G_BASE_VOIE.TA_VOIE_AD
     TABLESPACE G_ADT_INDX;
 
 CREATE INDEX TA_VOIE_ADMINISTRATIVE_FID_METADONNEE_IDX ON G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE(fid_metadonnee)
-    TABLESPACE G_ADT_INDX;
-
-CREATE INDEX TA_VOIE_ADMINISTRATIVE_FID_VOIE_SUPRA_COMMUNALE_IDX ON G_BASE_VOIE.TA_VOIE_ADMINISTRATIVE(fid_voie_supra_communale)
     TABLESPACE G_ADT_INDX;
 
 -- 5. Affectation du droit de sélection sur les objets de la table aux administrateurs
